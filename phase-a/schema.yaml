@@ -1,0 +1,117 @@
+title: "OAC AI Feedback Pipeline — Phase 1 (OCI Infrastructure)"
+description: "Provisions the OCI infrastructure for the OAC AI Assistant feedback pipeline: log group, OAC service log, Object Storage bucket, Service Connector, dynamic group, and two IAM policies (ADB-read, Connector-write). After Apply, copy the adb_location_uri output into the Phase 2 SQL installer."
+
+schemaVersion: 1.1.0
+version: "20260419"
+locale: "en"
+
+# --- Groups (control the form layout) ---
+variableGroups:
+  - title: "Hidden — do not edit"
+    visible: false
+    variables:
+      - user_ocid
+      - fingerprint
+      - private_key_path
+
+  - title: "Location"
+    variables:
+      - tenancy_ocid
+      - region
+      - compartment_ocid
+
+  - title: "Target Resources"
+    variables:
+      - oac_instance_ocid
+      - adb_ocid
+
+  - title: "Naming and Retention (Optional)"
+    variables:
+      - name_prefix
+      - bucket_name
+      - object_prefix
+      - log_retention_days
+      - bucket_namespace
+
+# --- Variable metadata (drives the form fields) ---
+variables:
+
+  # Resource Manager injects credentials via session, so these stay empty.
+  user_ocid:
+    type: string
+    default: ""
+  fingerprint:
+    type: string
+    default: ""
+  private_key_path:
+    type: string
+    default: ""
+
+  tenancy_ocid:
+    type: oci:iam:tenancy:id
+    title: "Tenancy"
+    description: "OCID of your tenancy. Resource Manager usually pre-fills this."
+    required: true
+
+  region:
+    type: oci:identity:region:name
+    title: "Region"
+    description: "OCI region where everything will be created, e.g. us-ashburn-1."
+    required: true
+
+  compartment_ocid:
+    type: oci:identity:compartment:id
+    title: "Compartment"
+    description: "Compartment that will hold the bucket, log group, service connector, and policies."
+    required: true
+
+  oac_instance_ocid:
+    type: string
+    title: "OAC Instance OCID"
+    description: "Paste the OCID of the OAC instance whose AI Assistant logs you want to capture. Starts with ocid1.analyticsinstance."
+    required: true
+    pattern: "^ocid1\\.analyticsinstance\\..+$"
+
+  adb_ocid:
+    type: string
+    title: "Autonomous Database OCID"
+    description: "Paste the OCID of the ADB that will pull logs from the bucket in Phase 2. Starts with ocid1.autonomousdatabase."
+    required: true
+    pattern: "^ocid1\\.autonomousdatabase\\..+$"
+
+  name_prefix:
+    type: string
+    title: "Resource Name Prefix"
+    description: "Short prefix applied to all created resources. Keep lowercase."
+    default: "oacfb"
+    required: false
+
+  bucket_name:
+    type: string
+    title: "Bucket Name"
+    description: "Name of the Object Storage bucket that will hold log files."
+    default: "oac-feedback-logs"
+    required: false
+
+  object_prefix:
+    type: string
+    title: "Object Key Prefix"
+    description: "Key prefix inside the bucket (ends with a trailing slash)."
+    default: "oac-ai/"
+    required: false
+
+  log_retention_days:
+    type: integer
+    title: "Log Retention (days)"
+    description: "How long the OAC service log keeps events before auto-deleting."
+    default: 30
+    minimum: 1
+    maximum: 180
+    required: false
+
+  bucket_namespace:
+    type: string
+    title: "Object Storage Namespace (advanced)"
+    description: "Optional. Leave empty to auto-detect from the tenancy."
+    default: ""
+    required: false

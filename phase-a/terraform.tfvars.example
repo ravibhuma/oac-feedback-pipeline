@@ -1,0 +1,59 @@
+# ============================================================================
+# OAC AI Feedback Pipeline - Phase 1 Terraform variables
+# ============================================================================
+# 1. Copy this file to terraform.tfvars:
+#      Windows: copy terraform.tfvars.example terraform.tfvars
+#      macOS/Linux: cp terraform.tfvars.example terraform.tfvars
+#
+# 2. Fill in the values for your OCI tenancy below.
+#
+# 3. Do NOT commit terraform.tfvars to version control.
+#    The .gitignore at the project root already excludes it.
+# ============================================================================
+
+
+# --- OCI authentication (local Terraform only) -------------------------------
+# If you're running Terraform locally on your laptop, fill in all four below.
+# If you're using Oracle Resource Manager instead, leave the "user_ocid",
+# "fingerprint", and "private_key_path" values as empty strings - Resource
+# Manager injects your login session automatically.
+
+tenancy_ocid     = "ocid1.tenancy.oc1..aaaaaaaa_replace_me"
+user_ocid        = "ocid1.user.oc1..aaaaaaaa_replace_me"
+fingerprint      = "aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99"
+private_key_path = "C:/Users/<you>/.oci/oci_api_key.pem"
+region           = "us-ashburn-1"
+
+
+# --- Target resources --------------------------------------------------------
+# The compartment that will hold the bucket, log group, service connector,
+# and policies. Usually the same compartment as your OAC instance.
+compartment_ocid  = "ocid1.compartment.oc1..aaaaaaaa_replace_me"
+
+# OCID of the Oracle Analytics Cloud instance whose AI Assistant logs you
+# want to capture. Find it in: Analytics & AI -> Analytics Cloud -> your instance.
+oac_instance_ocid = "ocid1.analyticsinstance.oc1.iad.aaaaaaaa_replace_me"
+
+# OCID of the Autonomous Database that will pull logs from the bucket in Phase 2.
+# Used to scope the IAM dynamic group and read-policy.
+# Leave empty to skip creating the dynamic group and policy (infra-only test).
+adb_ocid          = "ocid1.autonomousdatabase.oc1.iad.aaaaaaaa_replace_me"
+
+
+# --- Naming and retention (optional overrides) -------------------------------
+# Safe defaults. Override only if your naming conventions require it.
+
+# Short prefix prepended to every resource name. Keep lowercase.
+name_prefix        = "oacfb"
+
+# Name of the Object Storage bucket that will hold log files.
+bucket_name        = "oac-feedback-logs"
+
+# Key prefix within the bucket. Must end with a trailing slash.
+object_prefix      = "oac-ai/"
+
+# How many days OCI Logging retains events before auto-deleting.
+log_retention_days = 30
+
+# Object Storage namespace. Leave empty to auto-detect from the tenancy.
+bucket_namespace   = ""
